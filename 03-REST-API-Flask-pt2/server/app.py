@@ -17,7 +17,7 @@ from flask_migrate import Migrate
 from flask_restful import Api, Resource
 
 # 1.✅ Import NotFound from werkzeug.exceptions for error handling
-
+from werkzeug.exceptions import NotFound
 
 from models import db, Production, CastMember
 
@@ -65,14 +65,16 @@ class Productions(Resource):
             201,
         )
         return response
+    
 api.add_resource(Productions, '/productions')
-
 
 class ProductionByID(Resource):
     def get(self,id):
         production = Production.query.filter_by(id=id).first()
 # 3.✅ If a production is not found raise the NotFound exception
-    
+        if not production:
+            abort(404, "The production you were looking for is not found")
+
         production_dict = production.to_dict()
         response = make_response(
             production_dict,
@@ -96,8 +98,6 @@ class ProductionByID(Resource):
     # 5.4 delete the production and commit 
     # 5.5 create a response with the status of 204 and return the response 
   
-
-   
 api.add_resource(ProductionByID, '/productions/<int:id>')
 
 # 2.✅ use the @app.errorhandler() decorator to handle Not Found
@@ -110,7 +110,6 @@ api.add_resource(ProductionByID, '/productions/<int:id>')
 # if __name__ == '__main__':
 #     app.run(port=5000, debug=True)
 
-#Student Exercises 
 class CastMembers(Resource):
     def get(self):
         cast_members_list = [cast_member.to_dict() for cast_member in CastMember.query.all()]
@@ -140,3 +139,17 @@ class CastMembers(Resource):
         return response
 
 api.add_resource(CastMembers, '/cast_members')
+
+class CastMembersByID (Resource):
+    def get(self, id):
+        cast_member = CastMember.query.filter_by(id=id).first()
+
+        if not cast_member:
+            abort(404, "The cast member you were looking for is not found")
+        response = make_response(
+            cast_member.to_dict(),
+            200
+        )
+        return response
+    
+api.add_resource(CastMembersByID, '/cast_members/<int:id>')
