@@ -90,14 +90,43 @@ class ProductionByID(Resource):
     # 4.4 Loop through the request.form object and update the productions attributes. Note: Be cautions of the data types to avoid errors.
     # 4.5 add and commit the updated production 
     # 4.6 Create and return the response
-  
+    def patch(self,id):
+        production = Production.query.filter_by(id=id).first()
+        if not production:
+            abort(404, "The production you were trying to update was not found.")
+        
+        request_json = request.get_json()
+        for key in request_json:
+            setattr(production,key,request_json)
+        
+        db.session.add(production)
+        db.session.commit()
+        
+        response = make_response(
+            production.to_dict(),
+            200
+        )
+
+        return response
+
+    def delete(self,id):
+        production = Production.query.filter_by(id=id).first()
+        if not production:
+            abort(404, "The production you're looking for does not exist.")
+
+        db.session.delete(production)
+        db.session.commit()
+
+        response=make_response('', 202)
+
+        return response
 # 5.✅ Delete
     # 5.1 Create a delete method, pass it self and the id
     # 5.2 Query the Production 
     # 5.3 If the production is not found raise the NotFound exception
     # 5.4 delete the production and commit 
     # 5.5 create a response with the status of 204 and return the response 
-  
+    
 api.add_resource(ProductionByID, '/productions/<int:id>')
 
 # 2.✅ use the @app.errorhandler() decorator to handle Not Found
@@ -152,4 +181,37 @@ class CastMembersByID (Resource):
         )
         return response
     
+    def patch(self, id):
+        cast_member = CastMember.query.filter_by(id=id).first()
+        if not cast_member:
+            abort(404, "the cast member you're trying to update cannot be found.")
+        
+        request_json = request.get_json()
+        for key in request_json:
+            setattr(cast_member,key,request_json)
+        
+        db.session.add(cast_member)
+        db.session.commit()
+
+        response = make_response(
+            cast_member.to_dict(),
+            200
+        )
+
+        return response
+    
+    def delete(self,id):
+        cast_member = CastMember.query.filter_by(id=id).first()
+        if not cast_member:
+            abort(404, "The cast member you're trying to delete can't be found")
+        
+        db.session.delete(cast_member)
+        db.session.commit()
+
+        response = make_response('', 202)
+
+        return response
+    
 api.add_resource(CastMembersByID, '/cast_members/<int:id>')
+
+    
