@@ -1,6 +1,3 @@
-// 📚 Review With Students:
-    // Request response cycle
-    //Note: This was build using v5 of react-router-dom
 import { Route, Switch, useHistory } from 'react-router-dom'
 import {createGlobalStyle} from 'styled-components'
 import {useEffect, useState} from 'react'
@@ -16,6 +13,12 @@ function App() {
   const [production_edit, setProductionEdit] = useState(false)
   const history = useHistory()
   //5.✅ GET Productions
+  useEffect(()=>{
+    fetch('/productions')
+    .then(res => res.json())
+    .then(setProductions)
+  },[])
+
   
   // 6.✅ navigate to client/src/components/ProductionForm.js
 
@@ -65,5 +68,4 @@ const GlobalStyle = createGlobalStyle`
       background-color: black; 
       color:white;
     }
-    `
-
+`
